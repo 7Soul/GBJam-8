@@ -17,11 +17,11 @@ MoveSprite:
     pop af
     and KEY_DOWN
     call nz, .MoveSpriteDown
-    call UpdateSprites
 
     ldh a, [hJoypadPressed]
     and KEY_A
     call nz, .Fire
+    
     ret
 
 .MoveSpriteRight:
@@ -34,11 +34,6 @@ MoveSprite:
     ; ld hl, Sound1
     ; call LoadSound
 
-    ; ld a, 8 ; variable value
-    ; call SetSpriteByte
-    ; ld a, 0 ; variable
-    ; ld b, 0 ; sprite
-    ; call SetSpriteVar
     ret
 
 .MoveSpriteLeft:
@@ -70,7 +65,6 @@ MoveSprite:
 
 .Fire:
     ld a, [wSpriteNum]
-    inc a
     ld [wCurSprite], a
     ld a, BULLET + SIZE_MEDIUM
     ld [wSpriteByte], a
@@ -97,13 +91,6 @@ MoveSprite:
 	db 0, 0, $82, SPRITE_FLIPY ; sprite 1
 	db -1, -1, -1 ; sprite 2
 
-GetNextSpriteID:
-    ld a, [wSpriteNum]
-    inc a
-    ld [wSpriteNum], a
-    ld [wCurSprite], a
-    ret
-
 ; Updates all sprites based on main sprite
 UpdateSprites:
 ; Update Y pos
@@ -111,13 +98,22 @@ UpdateSprites:
     ld de, $4
     ld hl, SPRITES_START
 .loop
+    ; push hl
+    ; ld hl, SPRITES_START + 2 ; Tile ID
+    ; add hl, de
+    ; ld a, [hl]
+    ; pop hl
+    ; and a
+    ; jr z, .last_sprite
     call UpdateVertical
     add hl, de
     inc c
     ld a, [wSpriteNum]
+    dec a
     cp c
     jr nc, .loop
 
+; .last_sprite
 ; Update X pos
     ld c, 0
     ld de, $4
@@ -127,6 +123,7 @@ UpdateSprites:
     add hl, de
     inc c
     ld a, [wSpriteNum]
+    dec a
     cp c
     jr nc, .loop2
     ret
@@ -162,10 +159,12 @@ UpdateHorizontal:
 
 ; Takes sprite id in `wCurSprite` and variable in `wSpriteCurVar` and value in `wSpriteByte`
 SetSpriteVar:
+    push hl
+    push bc
     ld a, [wCurSprite]
     ld b, a
     ld a, [wSpriteCurVar]
-    ld c, 10
+    ld c, 20
     call SimpleMultiply
 	ld hl, wSpriteVars
     add b
@@ -174,6 +173,8 @@ SetSpriteVar:
 	add hl, bc
     ld a, [wSpriteByte]
 	ld [hl], a
+    pop bc
+    pop hl
     ret
 
 ; Takes sprite id in `wCurSprite` and variable in `wSpriteCurVar` 
@@ -184,7 +185,7 @@ GetSpriteVar:
     ld a, [wCurSprite]
     ld b, a
     ld a, [wSpriteCurVar]
-    ld c, 10
+    ld c, 20
     call SimpleMultiply
 	ld hl, wSpriteVars
     add b
@@ -365,4 +366,26 @@ LoadSpriteAttrs:
 	ld [hl], a
     cp -1
     jr nz, .loop
+    ret
+
+
+UpdateAnimations:
+    xor a
+    ld [wCurSprite], a
+.loop
+    ld a, SPR_ANIM_FRAME
+    ld [wSpriteCurVar], a
+    call GetSpriteVar
+    
+    inc a
+    ld [wSpriteByte], a
+    call SetSpriteVar
+
+    ld a, [wCurSprite]
+    inc a
+    ld [wCurSprite], a
+    ld c, a
+    ld a, [wSpriteNum]
+    cp c
+    jr nc, .loop
     ret

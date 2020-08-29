@@ -3,21 +3,55 @@ SecondsChanged:
 	
 	ret
 
+; 
+FrameTriggers:
+    ldh a, [hGameTimeFrames]
+    ld b, a
+    call TriggerHalfSecond
+
+    call TriggerQuarterSecond
+
+    call TriggerFifthSecond
+	ret
+
+TriggerHalfSecond:
+    
+    ret
+
+TriggerQuarterSecond:
+
+    ret
+
+TriggerFifthSecond:
+    ld a, b
+    and a
+    jr z, .zero
+.mod
+    sub 10
+    jr nc, .mod
+    add 10
+    ret nz
+.zero
+    call UpdateAnimations
+    ret
+
 IncreaseTimer:
-    ld hl, wGameTimeFrames
+    call FrameTriggers
+    ld hl, hGameTimeFrames
     ld a, [hl]
     inc a
     cp 60
     jr nc, .second
 
     ld [hl], a
+    
 	ret
 
 .second
 	xor a
 	ld [hl], a
 
-    ld hl, wGameTimeSeconds
+    ld hl, hGameTimeSeconds
     ld a, [hl]
     inc a
     daa
@@ -33,7 +67,7 @@ IncreaseTimer:
 	xor a
 	ld [hl], a
 
-    ld hl, wGameTimeMinutes
+    ld hl, hGameTimeMinutes
     ld a, [hl]
     inc a
     daa
@@ -47,19 +81,19 @@ RenderTimer:
     ld hl, .time_string
     call RenderTextToEnd
 
-    ld a, [wGameTimeSeconds]
+    ldh a, [hGameTimeSeconds]
 	ld b, $30
 	ld c, 1
 	lb de, 4, 0
 	call RenderTwoDecimalNumbers
 
-    ld a, [wGameTimeMinutes]
+    ldh a, [hGameTimeMinutes]
 	ld b, $30
 	ld c, 1
 	lb de, 1, 0
 	call RenderTwoDecimalNumbers
 
-    ; ld a, [wGameTimeFrames]
+    ; ldh a, [hGameTimeFrames]
     ; ld c, 5
     ; call SimpleMultiply
     ; ld c, 3

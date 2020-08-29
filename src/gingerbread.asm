@@ -8,8 +8,8 @@
 ; --- ROM Header ---
 
 ; Before importing gingerbread.asm, you can specify the following options to affect the game header
-IF !DEF(GAME_NAME)    
-GAME_NAME EQUS "GINGERBREAD"
+IF !DEF(GAME_NAME)
+GAME_NAME EQUS "PICKLEMETHIS"
 ENDC
 
 IF !DEF(GBC_SUPPORT)
@@ -210,6 +210,44 @@ SECTION "GingerBread RAM variables",WRAM0[$C1A1]
 RUNNING_ON_SGB: DS 1 
 RUNNING_ON_GBC: DS 1 
 
+SECTION "rst0", ROM0[$0000]
+	; di
+	; jp Start
+    rst $00
+
+SECTION "rst8", ROM0[$0008]
+; FarCall::
+; 	jp FarCall_hl
+    rst $08
+
+SECTION "rst10", ROM0[$0010]
+Bankswitch::
+	ldh [hROMBank], a
+	ld [ROM_BANK_SWITCH], a
+	ret
+
+SECTION "rst18", ROM0[$0018]
+	rst $38
+
+SECTION "rst20", ROM0[$0020]
+	rst $38
+
+SECTION "rst28", ROM0[$0028]
+JumpTable::
+	push de
+	ld e, a
+	ld d, 0
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+; SECTION "rst30", ROM0[$0030]
+	ld l, a
+	pop de
+	jp hl
+
+SECTION "rst38", ROM0[$0038]
+	rst $38
 
 ; --- Standard functions ---
 

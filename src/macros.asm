@@ -16,3 +16,15 @@ coord: MACRO
 	ld \1, (\3) * SCREEN_WIDTH + (\2) + \4
 	endc
 ENDM
+
+dbw: MACRO
+	db \1
+	dw \2
+ENDM
+
+dba: MACRO ; dbw bank, address
+rept _NARG
+	dbw BANK(\1), \1
+	shift
+endr
+ENDM

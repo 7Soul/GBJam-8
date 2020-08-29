@@ -3,3 +3,10 @@ hJoypadReleased:: db
 hJoypadPressed::  db
 hJoypadDown::     db
 hJoypadSum::      db
+hROMBank:: db
+
+
+; Timer
+hGameTimeMinutes:: db
+hGameTimeSeconds:: db
+hGameTimeFrames:: db

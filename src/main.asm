@@ -12,20 +12,34 @@ INCLUDE "engine/hblank.asm"
 SECTION "Home", ROM0
 
 Start:
+	xor a
+	ldh [hGameTimeMinutes], a
+	ldh [hGameTimeSeconds], a
+	ldh [hGameTimeFrames], a
+
     ld hl, FontTiles
     ld de, TILEDATA_START
     ld bc, FontTilesEnd - FontTiles
     call mCopyVRAM
 
+	xor a
+	push af
+	ld a, BANK("Graphics2")
+	rst Bankswitch
     ld hl, SpriteTiles
     ld de, TILEDATA_START + FontTilesEnd - FontTiles
     ld bc, SpriteTilesEnd - SpriteTiles
     call mCopyVRAM
+	pop af
+	rst Bankswitch
 
     call StartLCD
 	call EnableAudio
 
     jp Main
+
+; Test:
+; 	dba "Graphics2", 0
 
 Main:
 	call MainMenu
@@ -75,6 +89,7 @@ Main:
 UpdateGame::
 	call ReadKeys
 	call MoveSprite
+	call UpdateSprites
 	call IncreaseTimer
 
 	
@@ -88,13 +103,15 @@ UpdateGame::
 INCLUDE "engine/timer.asm"
 INCLUDE "engine/sprite.asm"
 INCLUDE "engine/main_menu.asm"
-
+INCLUDE "data/sprites.asm"
 
 SECTION "Graphics", ROMX
 
 FontTiles:
 INCBIN "gfx/backgrounds/font.2bpp"
 FontTilesEnd:
+
+SECTION "Graphics2", ROMX, BANK[2]
 
 SpriteTiles:
 INCBIN "gfx/sprites/sprite.2bpp"
