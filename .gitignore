@@ -3,4 +3,4 @@
 *.sav
 *.sym
 *.code-workspace
-/files/*
+/publish/*
