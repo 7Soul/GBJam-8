@@ -2,8 +2,9 @@
 SECTION "Includes@home",ROM0
 
 INCLUDE "gingerbread.asm"
-INCLUDE "constants.asm"
 INCLUDE "macros.asm"
+INCLUDE "constants.asm"
+
 INCLUDE "home.asm"
 INCLUDE "math.asm"
 
@@ -18,11 +19,17 @@ Start:
 	ldh [hGameTimeMinutes], a
 	ldh [hGameTimeSeconds], a
 	ldh [hGameTimeFrames], a
+
+	ld a, %11100100 ; 3 2 1 0 - white is transparent
+	ld [SPRITE_PALETTE_1], a
+	ld a, %00011110 ; 0 1 3 2 - dark gray is transparent
+	ld [SPRITE_PALETTE_2], a
+
 	call EnableAudio
     jp Main
 
 Main:
-	call MainMenu
+	call MainMenuLoad
 ; Game start
 	call ClearBackground
 	call LoadGameGraphics
@@ -77,11 +84,7 @@ UpdateGame::
 	call IncreaseTimer
 
 	
-; 	ld a, [wPlaySound]
-; 	and a
-; 	jr z, .no_sound
-; 	call PlaySoundHL
-; .no_sound
+	
 	reti
 
 INCLUDE "engine/timer.asm"

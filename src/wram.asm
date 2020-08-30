@@ -3,6 +3,9 @@ wTemp:: ds 1
 coreVBlankDone :: db
 wVBlankOccurred:: db
 wGameLoop:: db
+wMenuMode:: db
+wMenuAnimSpeed:: db
+wMenuCursor:: db
 wPlaySound:: dw
 
 wPalTemp:: db

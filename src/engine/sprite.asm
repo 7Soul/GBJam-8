@@ -93,7 +93,7 @@ MoveSprite:
     ld [wSpriteCurVar], a
     call SetSpriteVar
 
-    ld de, .bullet_sprites
+    ld de, bullet_sprites
     call LoadSpriteAttrs
 
     xor a
@@ -107,7 +107,7 @@ MoveSprite:
 
     ret
 
-.bullet_sprites:
+bullet_sprites:
 	db 0, 0, $82, $00 ; sprite 0
 	db 0, 0, $82, SPRITE_FLIPY ; sprite 1
 	db -1, -1, -1 ; sprite 2

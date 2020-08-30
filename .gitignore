@@ -3,3 +3,4 @@
 *.sav
 *.sym
 *.code-workspace
+/files/*

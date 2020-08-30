@@ -19,8 +19,7 @@ DelayFrames::
 	ret
 
 ShortWait::
-    ld c, 20
-    
+    ld c, 5
 .loop:    
     call DelayFrame
 	dec c
@@ -32,4 +31,28 @@ ClearBackground:
     ld hl, BACKGROUND_MAPDATA_START
     ld bc, 32 * 32
     call mSetVRAM
+	ret
+    
+FillBoxWithByte:
+.loop:
+    di
+        WaitForNonBusyLCDSafeA
+    ei
+.row
+	push bc
+	push hl
+.loop2:
+    di
+        WaitForNonBusyLCDSafeA
+    ei
+.col
+	ld [hli], a
+	dec c
+	jr nz, .loop2
+	pop hl
+	ld bc, $1F + 1
+	add hl, bc
+	pop bc
+	dec b
+	jr nz, .loop
 	ret

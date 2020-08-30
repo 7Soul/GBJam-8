@@ -500,7 +500,7 @@ mSetVRAM:
     dec b
     jr nz, .loop
     ret
-    
+
 ; Sets data to a constant value in a way that is NOT safe to use when writing to VRAM while LCD is on (but faster than mSetVRAM)
 ; A  - constant value to set
 ; HL - memory position of the start of the copying destination
@@ -517,7 +517,6 @@ mSet:
     dec b
     jr nz, .loop
     ret
-    
 
 ; --- Text and number display ---
 

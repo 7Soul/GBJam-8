@@ -1,6 +1,29 @@
 ; Triggers once per second
 SecondsChanged:
-	
+; 	ldh a, [hGameTimeSeconds]
+;     cp 2
+;     jr z, .spawn1
+;     ret
+; .spawn1
+;     ld a, [wSpriteNum]
+;     ld [wCurSprite], a
+;     ld a, BULLET + SIZE_MEDIUM
+;     ld [wSpriteByte], a
+;     ld a, SPR_PROPERTIES
+;     ld [wSpriteCurVar], a
+;     call SetSpriteVar
+
+;     ld de, bullet_sprites
+;     call LoadSpriteAttrs
+
+;     xor a
+;     ld [wCurSprite], a
+;     call GetSpriteXYAttr
+;     ld a, [wSpriteX]
+;     ld [wSpriteX + 1], a
+;     ld a, [wSpriteY]
+;     ld [wSpriteY + 1], a
+;     call SpawnSprite
 	ret
 
 ; 
