@@ -31,4 +31,7 @@ wSpriteDuration:: ds 20 ; SPR_ANIM_DUR
 wSpriteAnimFrame:: ds 20 ; SPR_ANIM_FRAME
 ENDU
 
+; Player
+wPlayerMotionX:: db
+wPlayerMotionY:: db
 wPlayerSpriteId:: db

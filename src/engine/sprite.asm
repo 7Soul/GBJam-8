@@ -2,22 +2,43 @@
 MoveSprite:
     xor a
     ld [wCurSprite], a
+    
+    ld a, [wPlayerMotionX]
+    and a
+    jr z, .can_move_x
+    
+    call UpdatePlayerMovementX
+    jr nz, .check_move_y
+
+.can_move_x
     ldh a, [hJoypadDown]
     push af
     and KEY_RIGHT
     call nz, .MoveSpriteRight
     pop af
-    push af
     and KEY_LEFT
     call nz, .MoveSpriteLeft
-    pop af
+    ; ret
+
+.check_move_y
+    ld a, [wPlayerMotionY]
+    and a
+    jr z, .can_move_y
+
+    call UpdatePlayerMovementY
+    jr nz, .check_fire
+
+.can_move_y
+    ldh a, [hJoypadDown]
     push af
     and KEY_UP
     call nz, .MoveSpriteUp
     pop af
     and KEY_DOWN
     call nz, .MoveSpriteDown
+    ; ret
 
+.check_fire
     ldh a, [hJoypadPressed]
     and KEY_A
     call nz, .Fire
@@ -26,11 +47,11 @@ MoveSprite:
 
 .MoveSpriteRight:
     call GetSpriteXAttr
-	add MOVE_SPEED
-    cp MARGIN_RIGHT
-    ret nc
-    ld [wSpriteX], a
-	call SetSpriteXAttr
+    cp LANEX5 + 8
+    ret z
+    ld a, [wPlayerMotionX]
+	add MOVE_TILE_X
+    ld [wPlayerMotionX], a
     ; ld hl, Sound1
     ; call LoadSound
 
@@ -38,29 +59,29 @@ MoveSprite:
 
 .MoveSpriteLeft:
     call GetSpriteXAttr
-	sub MOVE_SPEED
-    cp MARGIN_LEFT + 8
-    ret c
-    ld [wSpriteX], a
-	call SetSpriteXAttr
+    cp LANEX1 + 8
+    ret z
+    ld a, [wPlayerMotionX]
+	sub MOVE_TILE_X
+    ld [wPlayerMotionX], a
     ret
 
 .MoveSpriteUp:
     call GetSpriteYAttr
-	sub MOVE_SPEED
-    cp MARGIN_TOP + 8
+    cp MARGIN_TOP
     ret c
-    ld [wSpriteY], a
-	call SetSpriteYAttr
+    ld a, [wPlayerMotionY]
+	sub MOVE_TILE_Y
+    ld [wPlayerMotionY], a
     ret
 
 .MoveSpriteDown:
     call GetSpriteYAttr
-	add MOVE_SPEED
     cp MARGIN_BOT - 8
     ret nc
-    ld [wSpriteY], a
-	call SetSpriteYAttr
+    ld a, [wPlayerMotionY]
+	add MOVE_TILE_Y
+    ld [wPlayerMotionY], a
     ret
 
 .Fire:
@@ -90,6 +111,57 @@ MoveSprite:
 	db 0, 0, $82, $00 ; sprite 0
 	db 0, 0, $82, SPRITE_FLIPY ; sprite 1
 	db -1, -1, -1 ; sprite 2
+
+UpdatePlayerMovementX:
+    ld a, [wPlayerMotionX]
+    cp $80
+    jr nc, .left
+    call GetSpriteXAttr
+	add MOVE_SPEED_X
+    ld [wSpriteX], a
+	call SetSpriteXAttr
+
+    ld a, [wPlayerMotionX]
+    sub MOVE_SPEED_X
+    ld [wPlayerMotionX], a
+    ret
+
+.left
+    call GetSpriteXAttr
+	sub MOVE_SPEED_X
+    ld [wSpriteX], a
+	call SetSpriteXAttr
+
+    ld a, [wPlayerMotionX]
+    add MOVE_SPEED_X
+    ld [wPlayerMotionX], a
+    ret
+
+UpdatePlayerMovementY:
+    ld a, [wPlayerMotionY]
+    cp $80
+    jr nc, .up
+    call GetSpriteYAttr
+	add MOVE_SPEED_Y
+    ld [wSpriteY], a
+	call SetSpriteYAttr
+
+    ld a, [wPlayerMotionY]
+    sub MOVE_SPEED_Y
+    ld [wPlayerMotionY], a
+    ret
+
+.up
+    call GetSpriteYAttr
+	sub MOVE_SPEED_Y
+    ld [wSpriteY], a
+	call SetSpriteYAttr
+
+    ld a, [wPlayerMotionY]
+    add MOVE_SPEED_Y
+    ld [wPlayerMotionY], a
+    ret
+
 
 ; Updates all sprites based on main sprite
 UpdateSprites:

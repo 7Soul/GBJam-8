@@ -6,43 +6,27 @@ INCLUDE "constants.asm"
 INCLUDE "macros.asm"
 INCLUDE "home.asm"
 INCLUDE "math.asm"
-INCLUDE "engine/vblank.asm"
-INCLUDE "engine/hblank.asm"
+
 
 SECTION "Home", ROM0
+
+INCLUDE "engine/vblank.asm"
+INCLUDE "engine/hblank.asm"
 
 Start:
 	xor a
 	ldh [hGameTimeMinutes], a
 	ldh [hGameTimeSeconds], a
 	ldh [hGameTimeFrames], a
-
-    ld hl, FontTiles
-    ld de, TILEDATA_START
-    ld bc, FontTilesEnd - FontTiles
-    call mCopyVRAM
-
-	xor a
-	push af
-	ld a, BANK("Graphics2")
-	rst Bankswitch
-    ld hl, SpriteTiles
-    ld de, TILEDATA_START + FontTilesEnd - FontTiles
-    ld bc, SpriteTilesEnd - SpriteTiles
-    call mCopyVRAM
-	pop af
-	rst Bankswitch
-
-    call StartLCD
 	call EnableAudio
-
     jp Main
-
-; Test:
-; 	dba "Graphics2", 0
 
 Main:
 	call MainMenu
+; Game start
+	call ClearBackground
+	call LoadGameGraphics
+	call DrawBackground
 
 	ld a, PLAYER + SIZE_MEDIUM
     ld [wSpriteByte], a
@@ -58,7 +42,7 @@ Main:
 	xor a
 	ld [wPlayerSpriteId], a
 	
-	call RenderTimer
+	; call RenderTimer
 
 .main_loop_game:
 	; Wait for V-Blank
@@ -82,8 +66,8 @@ Main:
     jr .main_loop_game
 
 .player_sprites:
-	db SCREEN_HEIGHT / 2 * 8, SCREEN_WIDTH / 2 * 8, $80, $00 ; sprite 0
-	db SCREEN_HEIGHT / 2 * 8, SCREEN_WIDTH / 2 * 8, $80, SPRITE_FLIPX ; sprite 1
+	db SCREEN_HEIGHT / 2 * 8, LANEX3, $80, $00 ; sprite 0
+	db SCREEN_HEIGHT / 2 * 8, LANEX3, $80, SPRITE_FLIPX ; sprite 1
 	db -1, -1, -1, -1 ; sprite 2
 
 UpdateGame::
@@ -101,21 +85,28 @@ UpdateGame::
 	reti
 
 INCLUDE "engine/timer.asm"
+INCLUDE "engine/background.asm"
 INCLUDE "engine/sprite.asm"
 INCLUDE "engine/main_menu.asm"
 INCLUDE "data/sprites.asm"
 
-SECTION "Graphics", ROMX
+SECTION "Graphics", ROMX, BANK[2]
 
 FontTiles:
 INCBIN "gfx/backgrounds/font.2bpp"
 FontTilesEnd:
 
-SECTION "Graphics2", ROMX, BANK[2]
+BackgroundTiles:
+INCBIN "gfx/backgrounds/background.2bpp"
+BackgroundTilesEnd:
 
 SpriteTiles:
 INCBIN "gfx/sprites/sprite.2bpp"
 SpriteTilesEnd:
+
+TitleTiles:
+INCBIN "gfx/title_tileset.2bpp"
+TitleTilesEnd:
 
 
 SECTION "Sounds", ROMX

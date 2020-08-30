@@ -415,7 +415,7 @@ ENDM
 mCopyVRAM:
     inc b
     inc c
-    jr  .skip
+    jr .skip
 .loop:
     di
         ; This "WaitForNonBusyLCD" here, along with the disabled interrupts, makes it safe to read/write to/from VRAM when LCD is on
@@ -432,7 +432,36 @@ mCopyVRAM:
     dec b
     jr nz, .loop
     ret
-    
+
+mCopyBackground:
+.loop:
+    di
+        WaitForNonBusyLCD 
+        ld a, [hl+]
+        ld [de], a
+    ei
+    inc de
+.skip:
+    dec b
+    jr  nz, .loop
+; .skip2:
+    ld b, $14
+    call AddToDe
+    dec c
+    jr nz, .loop
+    ret
+
+AddToDe:
+    push hl
+    ld h, d
+    ld l, e
+    ld de, 12
+    add hl, de
+    ld d, h
+    ld e, l
+    pop hl
+    ret
+
 ; Copies data in a way that is NOT safe to use when reading/writing to/from VRAM while LCD is on (but faster than mCopyVRAM)
 ; HL - memory position of the start of the copying source
 ; DE - memory position of the start of the copying destination
@@ -463,7 +492,7 @@ mSetVRAM:
 .loop:
     di
         WaitForNonBusyLCDSafeA 
-        ld [hl+], a 
+        ld [hli], a 
     ei
 .skip:
     dec c

@@ -18,9 +18,18 @@ DelayFrames::
 	jr nz, DelayFrames
 	ret
 
+ShortWait::
+    ld c, 20
+    
+.loop:    
+    call DelayFrame
+	dec c
+	jr nz, .loop
+	ret
+
 ClearBackground:
-	ld a, 1 
+	ld a, 0
     ld hl, BACKGROUND_MAPDATA_START
-    ld bc, 32*32
+    ld bc, 32 * 32
     call mSetVRAM
 	ret

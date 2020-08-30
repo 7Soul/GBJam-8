@@ -60,7 +60,7 @@ IncreaseTimer:
     
     ld [hl], a
     call SecondsChanged
-    call RenderTimer
+    ; call RenderTimer
 	ret
 
 .minute
@@ -72,10 +72,14 @@ IncreaseTimer:
     inc a
     daa
     ld [hl], a
-    call RenderTimer
+    ; call RenderTimer
     ret
 
-RenderTimer:
+RenderTimer:   
+    ldh a, [rLCDC]
+    set 4, a
+    ldh [rLCDC], a
+
     ld c, 1
     lb de, 3, 0
     ld hl, .time_string
