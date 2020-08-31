@@ -15,14 +15,12 @@ INCLUDE "engine/vblank.asm"
 INCLUDE "engine/hblank.asm"
 
 Start:
-	xor a
-	ldh [hGameTimeMinutes], a
-	ldh [hGameTimeSeconds], a
-	ldh [hGameTimeFrames], a
+	call ResetTimer
 
-	ld a, %11100100 ; 3 2 1 0 - white is transparent
+	ld a, %11100100 ; 3 2 1 0
 	ld [SPRITE_PALETTE_1], a
-	ld a, %00011110 ; 0 1 3 2 - dark gray is transparent
+	ld a, %11000110 ; 0 1 3 2
+	
 	ld [SPRITE_PALETTE_2], a
 
 	call EnableAudio
@@ -35,13 +33,13 @@ Main:
 	call LoadGameGraphics
 	call DrawBackground
 
-	ld a, PLAYER + SIZE_MEDIUM
+	ld a, PLAYER + (SIZE_BIG << 4)
     ld [wSpriteByte], a
     ld a, SPR_PROPERTIES
     ld [wSpriteCurVar], a
     call SetSpriteVar
 
-	ld de, .player_sprites
+	ld de, Sprite_Player.player_top_idle_frame1
 	call LoadSpriteAttrs
 	
 	call SpawnSprite
@@ -53,11 +51,11 @@ Main:
 
 .main_loop_game:
 	; Wait for V-Blank
-    ld a,[coreVBlankDone]
+    ld a, [coreVBlankDone]
     and a                  ; V-Blank interrupt ?
     jr z, .main_loop_game  ; No, some other interrupt
     xor a
-    ld [coreVBlankDone],a  ; Clear V-Blank flag
+    ld [coreVBlankDone], a ; Clear V-Blank flag
 
     call UpdateGame
 
@@ -72,10 +70,21 @@ Main:
 
     jr .main_loop_game
 
-.player_sprites:
-	db SCREEN_HEIGHT / 2 * 8, LANEX3, $80, $00 ; sprite 0
-	db SCREEN_HEIGHT / 2 * 8, LANEX3, $80, SPRITE_FLIPX ; sprite 1
-	db -1, -1, -1, -1 ; sprite 2
+Sprite_Player:
+	dw .player_top_idle_frame1
+	dw .player_top_idle_frame2
+
+.player_top_idle_frame1:
+	db $A0, SPRITE_PAL ; sprite 0
+	db $A2, SPRITE_PAL ; sprite 1
+	db $A0, SPRITE_FLIPX + SPRITE_PAL ; sprite 2
+	db -1
+
+.player_top_idle_frame2:
+	db $A0, SPRITE_PAL ; sprite 0
+	db $A2, SPRITE_PAL ; sprite 1
+	db $A0, SPRITE_FLIPX + SPRITE_PAL ; sprite 2
+	db -1
 
 UpdateGame::
 	call ReadKeys
@@ -84,7 +93,6 @@ UpdateGame::
 	call IncreaseTimer
 
 	
-	
 	reti
 
 INCLUDE "engine/timer.asm"
@@ -92,6 +100,7 @@ INCLUDE "engine/background.asm"
 INCLUDE "engine/sprite.asm"
 INCLUDE "engine/main_menu.asm"
 INCLUDE "data/sprites.asm"
+
 
 SECTION "Graphics", ROMX, BANK[2]
 
@@ -149,6 +158,3 @@ INCLUDE "hram.asm"
 ; 	ld	a, [SCROLL_X]
 ; 	add 2
 ; 	ld	[SCROLL_X], a
-
-
-	

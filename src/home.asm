@@ -56,3 +56,9 @@ FillBoxWithByte:
 	dec b
 	jr nz, .loop
 	ret
+
+
+
+Sine:
+	calc_sine_wave
+	ret

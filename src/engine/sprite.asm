@@ -47,7 +47,7 @@ MoveSprite:
 
 .MoveSpriteRight:
     call GetSpriteXAttr
-    cp LANEX5 + 8
+    cp LANEX5 + 8 - 4
     ret z
     ld a, [wPlayerMotionX]
 	add MOVE_TILE_X
@@ -59,7 +59,7 @@ MoveSprite:
 
 .MoveSpriteLeft:
     call GetSpriteXAttr
-    cp LANEX1 + 8
+    cp LANEX1 + 8 - 4
     ret z
     ld a, [wPlayerMotionX]
 	sub MOVE_TILE_X
@@ -162,7 +162,6 @@ UpdatePlayerMovementY:
     ld [wPlayerMotionY], a
     ret
 
-
 ; Updates all sprites based on main sprite
 UpdateSprites:
 ; Update Y pos
@@ -170,13 +169,6 @@ UpdateSprites:
     ld de, $4
     ld hl, SPRITES_START
 .loop
-    ; push hl
-    ; ld hl, SPRITES_START + 2 ; Tile ID
-    ; add hl, de
-    ; ld a, [hl]
-    ; pop hl
-    ; and a
-    ; jr z, .last_sprite
     call UpdateVertical
     add hl, de
     inc c
@@ -185,7 +177,6 @@ UpdateSprites:
     cp c
     jr nc, .loop
 
-; .last_sprite
 ; Update X pos
     ld c, 0
     ld de, $4
@@ -204,8 +195,17 @@ UpdateVertical:
     ld a, c
     ld [wCurSprite], a
     call GetSpriteSize
-    and a
-    jr z, .small_skip
+    cp SIZE_SMALL
+    jr z, .small_skip ; no 2nd sprite
+    add c
+    ld c, a
+    ld a, [hl] ; vertical update
+    add hl, de
+    ld [hl], a
+    ; 3rd sprite check
+    ld a, [wSpriteSize]
+    cp SIZE_BIG
+    jr nz, .small_skip ; no 3rd sprite
     add c
     ld c, a
     ld a, [hl] ; vertical update
@@ -219,13 +219,23 @@ UpdateHorizontal:
     ld [wCurSprite], a
     call GetSpriteSize
     and a
-    jr z, .small_skip
+    jr z, .small_skip ; no 2nd sprite
     add c
     ld c, a
     ld a, [hl] ; take x position
     add 8
     add hl, de
     ld [hl], a ; copy x position + 8
+    ; 3rd sprite check
+    ld a, [wSpriteSize]
+    cp SIZE_BIG
+    jr nz, .small_skip ; no 3rd sprite
+    add c
+    ld c, a
+    ld a, [hl] ; take x position
+    add 8
+    add hl, de
+    ld [hl], a
 .small_skip
     ret
 
@@ -288,6 +298,7 @@ GetSpriteSize:
     call GetSpriteVar
     and SIZE_MASK
     swap a
+    ld [wSpriteSize], a
     ret
 
 ; Takes sprite id in `wCurSprite`
@@ -407,17 +418,17 @@ SetSpriteXAttr:
 LoadSpriteAttrs:
     ld bc, 0
 .loop
-	ld a, [de]
-    ld hl, wSpriteY
-    add hl, bc
-	ld [hl], a
-    inc de
+	; ld a, [de]
+    ; ld hl, wSpriteY
+    ; add hl, bc
+	; ld [hl], a
+    ; inc de
 
-    ld a, [de]
-    ld hl, wSpriteX
-    add hl, bc
-	ld [hl], a
-    inc de
+    ; ld a, [de]
+    ; ld hl, wSpriteX
+    ; add hl, bc
+	; ld [hl], a
+    ; inc de
 
     ld a, [de]
     ld hl, wSpriteTile
@@ -433,11 +444,10 @@ LoadSpriteAttrs:
     
     inc c
     ld a, [de]
-    ld hl, wSpriteY
-    add hl, bc
-	ld [hl], a
     cp -1
     jr nz, .loop
+    ld hl, wSpriteEnd
+	ld [hl], a
     ret
 
 

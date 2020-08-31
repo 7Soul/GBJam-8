@@ -1,6 +1,7 @@
 *.lnk
 *.gb
 *.sav
+*.sn*
 *.sym
 *.code-workspace
 /publish/*

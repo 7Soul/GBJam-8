@@ -25,9 +25,14 @@ MainMenu:
 	ld [wMenuMode], a
 	call ShortWait
 	call ShortWait
+	; Set initial background animation positions
 	ldh a, [SCROLL_Y]
-	add 64
+	add 80
 	ldh [SCROLL_Y], a
+	ld a, 2
+	ld [wMenuAnimSet], a
+	ld [wMenuAnimSpeed], a
+	ld [wMenuAnimCount], a
 	xor a
 	ld [wMenuMode], a
 	; Draw title screen
@@ -56,24 +61,14 @@ MainMenu:
 	call ShortWait
 	jp MenuLevelSelect
 
-	ld a, 1
-	ld [wGameLoop], a
-
-	ld hl, Sound1
-    ld a, h
-    ld [wPlaySound], a
-    ld a, l
-    ld [wPlaySound + 1], a
-	ret
-
 .nokeypress
 	ld a, [wMenuMode]
 	cp MENU_TITLE_ANIM
 	jr nz, .check_loop
 	
-	ld a, [wMenuAnimSpeed]
-	cp 3
-	jr nz, .check_loop
+	; ld a, [wMenuAnimSpeed]
+	; cp 3
+	; jr nz, .check_loop
 
 	ldh a, [SCROLL_Y]
     cp 0
@@ -109,13 +104,14 @@ INCBIN "data/title.tilemap"
 TitleEnd:
 
 MenuLevelSelect:
+	; Clear lower half background
 	xor a
     hlcoord 0, 11 ; x, y
 	lb bc, 6, SCREEN_WIDTH ; h, w
     call FillBoxWithByte
 
 	call ShortWait
-
+	; Draw text
 	lb de, $7, $C
     ld hl, .level1_string
     call RenderTextToEnd
@@ -129,12 +125,9 @@ MenuLevelSelect:
     call RenderTextToEnd
 
 	call ShortWait
-
-	ld a, $7F
+	; Draws cursor at initial position
 	hlcoord $5, $C ; x, y
-	ld bc, 1
-	call mSetVRAM
-
+	call DrawCursor
 
 .loop
 	call ReadKeys
@@ -150,6 +143,7 @@ MenuLevelSelect:
 
 	jr .loop
 .key_up
+	; Move cursor up
 	ld a, [wMenuCursor]
 	dec a
 	cp -1
@@ -157,6 +151,7 @@ MenuLevelSelect:
 	inc a
 	jr .update_cursor
 .key_down
+	; Move cursor down
 	ld a, [wMenuCursor]
 	inc a
 	cp 3
@@ -164,14 +159,17 @@ MenuLevelSelect:
 	dec a
 .update_cursor
 	ld [wMenuCursor], a
+	ld [wStage], a
 	ld hl, Sound2
     call LoadSound
-	; Clear cursor
+
+	; Clear cursor area
 	xor a
     hlcoord $5, $C ; x, y
 	lb bc, 3, 1 ; h, w
     call FillBoxWithByte
 
+	; Draw cursor
 	hlcoord $5, $C ; x, y
 	ld a, [wMenuCursor]
 	ld c, a
@@ -180,13 +178,18 @@ MenuLevelSelect:
 	ld b, 0
 	ld c, a
 	add hl, bc
-	ld a, $7F
-	ld bc, 1
-	call mSetVRAM
+	call DrawCursor
 
 	call ShortWait
 	jr .loop
 .end
+	ld a, 1
+	ld [wGameLoop], a
+
+	; Play confirmation sound
+	ld hl, Sound1
+    call LoadSound
+
 	ret
 
 .level1_string:
@@ -197,3 +200,10 @@ MenuLevelSelect:
 
 .level3_string:
 	db "Stage 3@"
+
+; Takes coordinate in `hl`
+DrawCursor:
+	ld a, $7F
+	ld bc, 1
+	call mSetVRAM
+	ret

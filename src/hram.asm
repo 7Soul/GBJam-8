@@ -4,6 +4,8 @@ hJoypadPressed::  db
 hJoypadDown::     db
 hJoypadSum::      db
 hROMBank:: db
+hVBlanks:: db
+hHBlanks:: db
 
 
 ; Timer

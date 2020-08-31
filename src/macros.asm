@@ -4,6 +4,8 @@ lb: MACRO ; r, hi, lo
 	ld \1, ((\2) & $ff) << 8 | ((\3) & $ff)
 ENDM
 
+; Data
+
 hlcoord EQUS "coord hl,"
 bccoord EQUS "coord bc,"
 decoord EQUS "coord de,"
@@ -29,6 +31,8 @@ rept _NARG
 endr
 ENDM
 
+; Constants
+
 const_def: MACRO
 if _NARG >= 1
 const_value = \1
@@ -45,4 +49,62 @@ ENDM
 const: MACRO
 \1 EQU const_value
 const_value = const_value + const_inc
+ENDM
+
+; Math
+
+sine_table: MACRO
+; \1 samples of sin(x) from x=0 to x<32768 (pi radians)
+x = 0
+rept \1
+	dw (sin(x) + (sin(x) & $ff)) >> 8 ; round up
+x = x + DIV(32768, \1) ; a circle has 65536 "degrees"
+endr
+ENDM
+
+calc_sine_wave: MACRO
+; input: a = a signed 6-bit value
+; output: a = d * sin(a * pi/32)
+	and %111111
+	cp %100000
+	jr nc, .negative\@
+	call .apply\@
+	ld a, h
+	ret
+.negative\@
+	and %011111
+	call .apply\@
+	ld a, h
+	xor $ff
+	inc a
+	ret
+.apply\@
+	ld e, a
+	ld a, d
+	ld d, 0
+if _NARG == 1
+	ld hl, \1
+else
+	ld hl, .sinetable\@
+endc
+	add hl, de
+	add hl, de
+	ld e, [hl]
+	inc hl
+	ld d, [hl]
+	ld hl, 0
+.multiply\@ ; factor amplitude
+	srl a
+	jr nc, .even\@
+	add hl, de
+.even\@
+	sla e
+	rl d
+	and a
+	jr nz, .multiply\@
+	ret
+if _NARG == 0
+.sinetable\@
+	sine_table 64
+endc
 ENDM

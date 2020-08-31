@@ -119,22 +119,14 @@ RenderTimer:
 	ld c, 1
 	lb de, 1, 0
 	call RenderTwoDecimalNumbers
-
-    ; ldh a, [hGameTimeFrames]
-    ; ld c, 5
-    ; call SimpleMultiply
-    ; ld c, 3
-    ; call SimpleDivide
-    ; ld a, b
-    ; sub 1
-    ; add 1
-    ; daa
-    
-	; ld b, $30
-	; ld c, 1
-	; lb de, 7, 0
-	; call RenderTwoDecimalNumbers
     ret
 
 .time_string:
     db ":@"
+
+ResetTimer:
+    xor a
+	ldh [hGameTimeMinutes], a
+	ldh [hGameTimeSeconds], a
+	ldh [hGameTimeFrames], a
+    ret

@@ -3,37 +3,43 @@ DrawBackground:
     res 4, a
     ldh [rLCDC], a
 
-    call DrawBorder
-
-    ld a, 5
-    call DrawEntrance
-
-    ; ld hl, .data
-    ; ld de, BACKGROUND_MAPDATA_START + 32
-    ; ld bc, 1
-    ; call mCopyVRAM
-
+    call DrawStage
 
     ret
 
-.data:
-    db $4
-
-DrawBorder:
-    ld hl, Border
+DrawStage:
+    ld a, [wStage]
+    ld hl, StagesTiles
+    ld e, a
+	ld d, 0
+	add hl, de
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
     ld de, BACKGROUND_MAPDATA_START
     lb bc, $14, $12
     call mCopyBackground
     ret
 
-DrawEntrance:
-    ret
+StagesTiles:
+    dw Stage1
+    dw Stage2
+    dw Stage3
 
-Border:
-INCBIN "data/border.tilemap"
-BorderEnd:
+Stage1:
+INCBIN "data/stage1.tilemap"
+Stage1End:
 
-LoadGameGraphics::
+Stage2:
+INCBIN "data/stage2.tilemap"
+Stage2End:
+
+Stage3:
+INCBIN "data/stage2.tilemap"
+Stage3End:
+
+LoadGameGraphics:
     xor a
 	push af
 	ld a, BANK("Graphics")
@@ -56,6 +62,4 @@ LoadGameGraphics::
 
 	pop af
 	rst Bankswitch
-
-
     ret

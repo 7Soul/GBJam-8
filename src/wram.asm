@@ -5,8 +5,11 @@ wVBlankOccurred:: db
 wGameLoop:: db
 wMenuMode:: db
 wMenuAnimSpeed:: db
+wMenuAnimSet:: db
+wMenuAnimCount:: db
 wMenuCursor:: db
 wPlaySound:: dw
+wStage:: db
 
 wPalTemp:: db
 
@@ -18,6 +21,7 @@ wSpriteY::     ds MAX_SIZE ; Current Sprite Y
 wSpriteX::     ds MAX_SIZE ; Current Sprite X
 wSpriteTile::  ds MAX_SIZE ; Current Sprite Tile 
 wSpriteFlags:: ds MAX_SIZE ; Current Sprite Flags
+wSpriteEnd:: db
 wSpriteSize::  db          ; Current Sprite Size
 wSpriteCurVar:: db         ; Current Sprite Variable being dealt with
 wSpriteByte::  db          ; Last value of a sprite variable

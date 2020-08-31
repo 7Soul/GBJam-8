@@ -421,7 +421,7 @@ mCopyVRAM:
         ; This "WaitForNonBusyLCD" here, along with the disabled interrupts, makes it safe to read/write to/from VRAM when LCD is on
         ; Essentially, we're waiting for the LCD to be non-busy before reading/writing. If we don't do this, we can
         ; read/write when the LCD is busy which results in corrupted data.
-        WaitForNonBusyLCD 
+        WaitForNonBusyLCD
         ld a, [hl+]
         ld [de], a
     ei
