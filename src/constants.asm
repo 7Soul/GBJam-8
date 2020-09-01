@@ -29,31 +29,43 @@ SOUND_1 EQU 1
 
 ; SPRITE VARIABLE CONSTANTS
     const_def
-    const SPR_PROPERTIES ; 0
-    const SPR_VAR1       ; 1
-    const SPR_VAR2       ; 2
-    const SPR_VAR3       ; 3
-    const SPR_ANIM       ; 4
-    const SPR_ANIM_DUR   ; 5
-    const SPR_ANIM_FRAME ; 6
+    const SPR_PROPERTIES   ; 0
+    const SPR_VAR1         ; 1
+    const SPR_VAR2         ; 2
+    const SPR_VAR3         ; 3
+    const SPR_ANIM_DUR     ; 4
+    const SPR_ANIM_FRAME   ; 5
+    const SPR_ANIM_FRAMES  ; 6
+    const SPR_ANIM_CHANGED ; 7
 
 ; SPRITE PROPERTIES
 ; SPRITE TYPE CONSTANTS
-PLAYER    EQU %0000
-ENEMY     EQU %0001
-BULLET    EQU %0011
-TYPE_3    EQU %0100
+    const_def
+    const PLAYER
+    const ENEMY 
+    const BULLET
+    const TYPE_3
+    const TYPE_4
 TYPE_MASK EQU %1111
+
 ; SPRITE SIZE CONSTANTS
 SIZE_MASK   EQU %110000
 SIZE_SMALL  EQU %00
 SIZE_MEDIUM EQU %01
-SIZE_BIG    EQU %11
+SIZE_BIG    EQU %10
 MAX_SIZE    EQU 3
 
+; ANIMATION CONSTANTS (used in data/animations.asm)
+    const_def
+    const ANIM_MOVE_DOWN
+    const ANIM_MOVE_UP
+    const ANIM_MOVE_RIGHT
+    const ANIM_MOVE_LEFT
+
 ; STAGE CONSTANTS
-LANEX1 EQU 24
-LANEX2 EQU LANEX1 + 24
-LANEX3 EQU LANEX2 + 24
-LANEX4 EQU LANEX3 + 24
-LANEX5 EQU LANEX4 + 24
+    const_def 0, 24
+    const LANEX1
+    const LANEX2
+    const LANEX3
+    const LANEX4
+    const LANEX5

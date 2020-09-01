@@ -16,6 +16,9 @@ INCLUDE "engine/hblank.asm"
 
 Start:
 	call ResetTimer
+	xor a
+	ldh [hVBlanks], a
+	ldh [hHBlanks], a
 
 	ld a, %11100100 ; 3 2 1 0
 	ld [SPRITE_PALETTE_1], a
@@ -33,13 +36,14 @@ Main:
 	call LoadGameGraphics
 	call DrawBackground
 
-	ld a, PLAYER + (SIZE_BIG << 4)
-    ld [wSpriteByte], a
-    ld a, SPR_PROPERTIES
-    ld [wSpriteCurVar], a
+	ldw wSpriteByte, PLAYER + (SIZE_BIG << 4)
+	ldw wSpriteCurVar, SPR_PROPERTIES
+    call SetSpriteVar
+	ldw wSpriteByte, 4
+	ldw wSpriteCurVar, SPR_ANIM_DUR
     call SetSpriteVar
 
-	ld de, Sprite_Player.player_top_idle_frame1
+	ld hl, Sprite_Player
 	call LoadSpriteAttrs
 	
 	call SpawnSprite
@@ -70,25 +74,10 @@ Main:
 
     jr .main_loop_game
 
-Sprite_Player:
-	dw .player_top_idle_frame1
-	dw .player_top_idle_frame2
-
-.player_top_idle_frame1:
-	db $A0, SPRITE_PAL ; sprite 0
-	db $A2, SPRITE_PAL ; sprite 1
-	db $A0, SPRITE_FLIPX + SPRITE_PAL ; sprite 2
-	db -1
-
-.player_top_idle_frame2:
-	db $A0, SPRITE_PAL ; sprite 0
-	db $A2, SPRITE_PAL ; sprite 1
-	db $A0, SPRITE_FLIPX + SPRITE_PAL ; sprite 2
-	db -1
 
 UpdateGame::
 	call ReadKeys
-	call MoveSprite
+	call MovePlayer
 	call UpdateSprites
 	call IncreaseTimer
 
@@ -97,9 +86,11 @@ UpdateGame::
 
 INCLUDE "engine/timer.asm"
 INCLUDE "engine/background.asm"
+INCLUDE "engine/player.asm"
 INCLUDE "engine/sprite.asm"
 INCLUDE "engine/main_menu.asm"
 INCLUDE "data/sprites.asm"
+INCLUDE "data/animations.asm"
 
 
 SECTION "Graphics", ROMX, BANK[2]
@@ -125,9 +116,7 @@ SECTION "Sounds", ROMX
 
 Sound1:
 dw SOUND_CH4_START
-db %00000000 ; Data to be written to SOUND_CH4_STARTwsl
-esl
-
+db %00000000 ; Data to be written to SOUND_CH4_START
 db %00000100 ; Data to be written to SOUND_CH4_LENGTH
 db %11110111 ; Data to be written to SOUND_CH4_ENVELOPE 
 db %01010101 ; Data to be written to SOUND_CH4_POLY 

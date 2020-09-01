@@ -33,11 +33,21 @@ FrameTriggers:
     call TriggerHalfSecond
 
     call TriggerQuarterSecond
-
+    ldh a, [hGameTimeFrames]
+    ld b, a
     call TriggerFifthSecond
 	ret
 
 TriggerHalfSecond:
+    ld a, b
+    and a
+    jr z, .zero
+.mod
+    sub 30
+    jr nc, .mod
+    add 30
+    ret nz
+.zero
     
     ret
 
@@ -50,9 +60,9 @@ TriggerFifthSecond:
     and a
     jr z, .zero
 .mod
-    sub 10
+    sub 5
     jr nc, .mod
-    add 10
+    add 5
     ret nz
 .zero
     call UpdateAnimations

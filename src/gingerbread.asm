@@ -241,10 +241,10 @@ JumpTable::
 	add hl, de
 	ld a, [hli]
 	ld h, [hl]
-; SECTION "rst30", ROM0[$0030]
 	ld l, a
 	pop de
 	jp hl
+; SECTION "rst30", ROM0[$0030]
 
 SECTION "rst38", ROM0[$0038]
 	rst $38

@@ -3,9 +3,11 @@ VBlankRoutine:
     push bc
     push de
     push hl
+
     ldh a, [hVBlanks]
     inc a
     ldh [hVBlanks], a
+
 	xor a
     ld [wVBlankOccurred], a
     ld a, 1

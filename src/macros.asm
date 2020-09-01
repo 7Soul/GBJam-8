@@ -4,6 +4,11 @@ lb: MACRO ; r, hi, lo
 	ld \1, ((\2) & $ff) << 8 | ((\3) & $ff)
 ENDM
 
+ldw: MACRO ; Load constant 2 into wRAM byte 1
+	ld a, \2
+	ld [\1], a
+ENDM
+
 ; Data
 
 hlcoord EQUS "coord hl,"
