@@ -1,4 +1,5 @@
 DrawBackground:
+    ; Set background to use tileset from vram address 0
     ldh a, [rLCDC]
     res 4, a
     ldh [rLCDC], a

@@ -113,3 +113,38 @@ if _NARG == 0
 	sine_table 64
 endc
 ENDM
+
+
+change_animation: MACRO
+	ldw wSpriteByte, \1
+	ldw wSpriteCurVar, SPR_DIR
+    call SetSpriteVar
+	ldw wSpriteByte, 1
+    ldw wSpriteCurVar, SPR_ANIM_CHANGED
+    call SetSpriteVar
+    ldw wSpriteByte, 0
+	ldw wSpriteCurVar, SPR_ANIM_DUR
+	call SetSpriteVar
+	; call AnimNextFrame
+	; call UpdateAnimations
+ENDM
+
+anim_group: MACRO
+	db \1 + (\2 << 3) ; frames and loop
+	dw \3             ; pointer to animation
+	dw \4             ; pointer to next animation
+ENDM
+
+anim: MACRO
+	dw \1_1
+	dw \1_2
+	dw \1_3
+	dw \1_4
+ENDM
+
+anim_frame: MACRO
+	db \2, \1         ; X and Y offsets
+	db \3             ; sprite tile
+	db \4             ; sprite flags
+ENDM
+

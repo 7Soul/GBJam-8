@@ -14,7 +14,8 @@ wStage:: db
 wPalTemp:: db
 
 ; Sprites
-wSpriteNum::         db     ; Number of sprites in use
+wSpriteNum::		 db     ; Number of sprites in use
+wSpawnSprite::       db
 wCurSprite::         db     ; Current sprite being dealt with
 wCurSpriteLoop::     db     ; Current sprite being dealt with
 wSpriteY::     ds MAX_SIZE  ; Current Sprite Y
@@ -27,18 +28,23 @@ wSpriteCurVar::      db     ; Current Sprite Variable being dealt with
 wSpriteByte::        db     ; Last value of a sprite variable
 
 UNION
-wSpriteVars:: ds 7 * 20
+wSpriteVars::        ds 9 * SPRITE_MAX
 NEXTU
-wSpriteVar1::        ds 20  ; SPR_PROPERTIES
-wSpriteVar2::        ds 20  ; SPR_VAR1
-wSpriteVar3::        ds 20  ; SPR_VAR2
-wSpriteVar4::        ds 20  ; SPR_VAR3
-wSpriteAnimDur::     ds 20  ; SPR_ANIM_DUR    ; Counts down time frames until next animation frame
-wSpriteAnimFrame::   ds 20  ; SPR_ANIM_FRAME  ; Current frame index
-wSpriteAnimFrames::  ds 20  ; SPR_ANIM_FRAMES ; Number of frames in cur anim
-wSpriteAnimChanged:: ds 20  ; SPR_ANIM_CHANGED
+wSpriteVar1::        ds SPRITE_MAX  ; SPR_PROPERTIES
+wSpriteVar2::        ds SPRITE_MAX  ; SPR_DIR
+wSpriteVarYOff::     ds SPRITE_MAX  ; SPR_YOFFSET
+wSpriteVarXOff::     ds SPRITE_MAX  ; SPR_XOFFSET
+wSpriteAnimName::    ds SPRITE_MAX  ; SPR_ANIM_NAME
+wSpriteAnimDur::     ds SPRITE_MAX  ; SPR_ANIM_DUR    ; Counts down time frames until next animation frame
+wSpriteAnimFrame::   ds SPRITE_MAX  ; SPR_ANIM_FRAME  ; Current frame index
+wSpriteAnimFrames::  ds SPRITE_MAX  ; SPR_ANIM_FRAMES ; Number of frames in current animation + loop properties
+wSpriteAnimChanged:: ds SPRITE_MAX  ; SPR_ANIM_CHANGED
 ENDU
-wSpriteAnim::        ds 40  ; Pointer to animation
+wSpriteAnimGroup::   ds SPRITE_MAX * 2  ; Pointer to animation group
+wSpriteAnimPointer:: ds SPRITE_MAX * 2  ; Pointer to animation
+wSpriteAnim::        ds SPRITE_MAX * 2  ; Pointer to frame of anim
+
+wSpriteAnimNext::    ds SPRITE_MAX * 2  ; Pointer to next animation
 
 ; Player
 wPlayerMotionX:: db

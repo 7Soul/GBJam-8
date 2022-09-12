@@ -36,12 +36,22 @@ Main:
 	call LoadGameGraphics
 	call DrawBackground
 
-	ldw wSpriteByte, PLAYER + (SIZE_BIG << 4)
+	ldw wSpriteByte, PLAYER + (2 << 4)
 	ldw wSpriteCurVar, SPR_PROPERTIES
     call SetSpriteVar
 	ldw wSpriteByte, 4
 	ldw wSpriteCurVar, SPR_ANIM_DUR
     call SetSpriteVar
+	ldw wSpriteByte, ANIM_IDLE
+	ldw wSpriteCurVar, SPR_ANIM_NAME
+    call SetSpriteVar
+
+	ld a, COL4
+	ld [wSpriteX], a
+	call SetSpriteXAttr
+	ld a, ROW3
+	ld [wSpriteY], a
+	call SetSpriteYAttr
 
 	ld hl, Sprite_Player
 	call LoadSpriteAttrs
@@ -76,12 +86,12 @@ Main:
 
 
 UpdateGame::
+	halt 
+    nop 
 	call ReadKeys
 	call MovePlayer
 	call UpdateSprites
 	call IncreaseTimer
-
-	
 	reti
 
 INCLUDE "engine/timer.asm"

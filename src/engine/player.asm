@@ -45,8 +45,11 @@ MovePlayer:
 
 .MoveSpriteRight:
     call GetSpriteXAttr
-    cp LANEX5 + 8 - 4
-    ret z
+    cp COL7 - 4
+    ret nc
+
+    change_animation DIR_R
+
     ld a, [wPlayerMotionX]
 	add MOVE_TILE_X
     ld [wPlayerMotionX], a
@@ -54,8 +57,12 @@ MovePlayer:
 
 .MoveSpriteLeft:
     call GetSpriteXAttr
-    cp LANEX1 + 8 - 4
+    cp COL0 + 8 - 4
+    ret c
     ret z
+
+    change_animation DIR_L
+
     ld a, [wPlayerMotionX]
 	sub MOVE_TILE_X
     ld [wPlayerMotionX], a
@@ -63,8 +70,12 @@ MovePlayer:
 
 .MoveSpriteUp:
     call GetSpriteYAttr
-    cp MARGIN_TOP
+    cp ROW0
     ret c
+    ret z
+
+    change_animation DIR_U
+
     ld a, [wPlayerMotionY]
 	sub MOVE_TILE_Y
     ld [wPlayerMotionY], a
@@ -72,8 +83,11 @@ MovePlayer:
 
 .MoveSpriteDown:
     call GetSpriteYAttr
-    cp MARGIN_BOT - 8
+    cp ROW6
     ret nc
+
+    change_animation DIR_D
+
     ld a, [wPlayerMotionY]
 	add MOVE_TILE_Y
     ld [wPlayerMotionY], a
@@ -82,22 +96,27 @@ MovePlayer:
 .Fire:
     ld a, [wSpriteNum]
     ld [wCurSprite], a
-    ld a, BULLET + (SIZE_MEDIUM << 4)
-    ld [wSpriteByte], a
-    ld a, SPR_PROPERTIES
-    ld [wSpriteCurVar], a
+
+    ldw wSpriteByte, BULLET + (SIZE_MEDIUM << 4)
+	ldw wSpriteCurVar, SPR_PROPERTIES
+    call SetSpriteVar
+	ldw wSpriteByte, 4
+	ldw wSpriteCurVar, SPR_ANIM_DUR
     call SetSpriteVar
 
-    ld de, bullet_sprites
+    ld hl, Sprite_Veggie
     call LoadSpriteAttrs
+
+    ld a, [wCurSprite]
+    push af
 
     xor a
     ld [wCurSprite], a
     call GetSpriteXYAttr
-    ld a, [wSpriteX]
-    ld [wSpriteX + 1], a
-    ld a, [wSpriteY]
-    ld [wSpriteY + 1], a
+
+    pop af
+    ld [wCurSprite], a
+    
     call SpawnSprite
 
     ret

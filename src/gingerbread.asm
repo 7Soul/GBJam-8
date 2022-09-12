@@ -1331,10 +1331,11 @@ ENDC ; End of Super Game Boy functionality
 ; Interrupts
 SECTION	"vblank interrupt",ROM0[$0040]
     call VBlankRoutine
-
     jp	DMACODE_START ; sprites should be updated on every vblank
+    
 SECTION	"LCDC interrupt",ROM0[$0048]
-    jp	HBlankRoutine
+    reti
+    ; jp	HBlankRoutine
 
 SECTION	"Timer overflow interrupt",ROM0[$0050]
     reti
@@ -1447,11 +1448,11 @@ ENDC
     call StopLCD
     call initdma
     
-    ld	a, IEF_VBLANK | IEF_LCDC ; We only want vblank interrupts (for updating sprites)
+    ld	a, IEF_VBLANK ;| IEF_LCDC ; We only want vblank interrupts (for updating sprites)
     ld	[rIE], a 
 
-    ld	a, STATF_MODE00	; horizontal blank interrupt flag
-	ld	[rSTAT], a	; throw interrupt during HBLANK on LCDC
+    ; ld	a, STATF_MODE00	; horizontal blank interrupt flag
+	; ld	[rSTAT], a	; throw interrupt during HBLANK on LCDC
     
     ei
     

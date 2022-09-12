@@ -109,6 +109,7 @@ IncreaseTimer:
     ret
 
 RenderTimer:   
+    ; Set background to use tileset from vram address 1
     ldh a, [rLCDC]
     set 4, a
     ldh [rLCDC], a
